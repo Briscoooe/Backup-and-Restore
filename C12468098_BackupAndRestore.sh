@@ -9,41 +9,6 @@
 
 clear
 
-# This function is used to validate yes or no answers inputted by the user
-# It was taken from this public GitHub repository https://gist.github.com/davejamesmiller/1965569
-
-ask()
-{
-	while true; do
-
-		if [ "${2:-}" = "Y" ]; then
-			prompt="Y/n"
-			default=Y
-		elif [ "${2:-}" = "N" ]; then
-			prompt="y/N"
-			default=N
-		else
-			prompt="y/n"
-			default=
-		fi
-
-		# Ask the question - use /dev/tty in case stdin is redirected from somewhere else
-		read -p "$1 [$prompt] " REPLY </dev/tty
-
-		# Default?
-		if [ -z "$REPLY" ]; then
-			REPLY=$default
-		fi
-
-		# Check if the reply is valid
-		case "$REPLY" in
-			Y*|y*) return 0 ;;
-			N*|n*) return 1 ;;
-		esac
-
-	done
-}
-
 # This function adds the cron job to the cron table
 add_cron()
 {
@@ -80,15 +45,11 @@ elif [ "$options" = "Incremental_Backup" ]; then
         echo -e "\nIncremental backup complete!";
 
 elif [ "$options" = "Schedule_Backup" ]; then
-	if ask "Would you like to schedule backups to the location previously specified?"; then
-		echo $location;
-	else
-		read -p "Enter the ABSOLUTE path for the backup to be stored " location;
-		echo $location >> exclude_list.txt;
+	read -p "Enter the ABSOLUTE path for the backup to be stored " location;
+	echo $location >> exclude_list.txt;
 
-		# Making the backup directory in case it doesn't exist already
-		mkdir -p $location;
-	fi
+	# Making the backup directory in case it doesn't exist already
+	mkdir -p $location;
 
 	echo "How frequently would you like the backup to be done?"
 
