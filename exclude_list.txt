@@ -1,0 +1,10 @@
+/dev/*
+/proc/*
+/sys/*
+/tmp/*
+/run/*
+/mnt/*
+/lost+found
+/home/user/backup2
+/home/user/test
+/home/user/test1
