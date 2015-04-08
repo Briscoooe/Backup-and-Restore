@@ -51,7 +51,7 @@ elif [ "$options" = "Schedule_Backup" ]; then
 	# Making the backup directory in case it doesn't exist already
 	mkdir -p $location;
 
-	echo "How frequently would you like the backup to be done?"
+	echo "How frequently would you like the backup to be performed?"
 
 	cron_choices="Annually Monthly Weekly Daily"
 	select cron_options in $cron_choices; do
@@ -74,7 +74,7 @@ elif [ "$options" = "Schedule_Backup" ]; then
 	fi
 	done
 elif [ "$options" = "View_Scheduled_Backups" ]; then
-	crontab -l;
+	crontab -l | grep rsync;
 elif [ "$options" = "Restore_Most_Recent_Backup" ]; then
 	rsync -avr ssh --progress --delete * user@83.212.127.62:/;
 	echo "Most recent backup restored"
