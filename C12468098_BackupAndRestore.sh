@@ -67,7 +67,7 @@ clear
 # This function adds the cron job to the cron table
 add_cron()
 {
-	crontab -l | { cat; echo "$1 rsync -avbzhe ssh --delete --progress --max-size='10000k' --exclude-from 'exclude_list.txt' / user@83.212.127.62:$location;"; } | crontab -;
+	crontab -l | { cat; echo "$1 rsync -avbzhe --delete --progress --max-size='10000k' --exclude-from 'exclude_list.txt' / $location;"; } | crontab -;
 }
 
 choices="Full_Backup Incremental_Backup Schedule_Backup View_Scheduled_Backups Restore_Most_Recent_Backup Quit"
@@ -84,11 +84,11 @@ if [ "$options" = "Full_Backup" ]; then
 	mkdir -p $location;
 
 	echo "Starting intial backup";
-	rsync -avzhe ssh --progress --delete --max-size='10000k' --exclude-from 'exclude_list.txt' / user@83.212.127.62:$location;
+#	rsync -avzhe --progress --delete --max-size='10000k' --exclude-from 'exclude_list.txt' / $location;
 	echo -e "\nInitial backup complete!";
 
 elif [ "$options" = "Incremental_Backup" ]; then
-	
+
 	location=`get_path $path`;
 
 	# Adding the path to the exclude list to avoid an infinite loop
@@ -98,7 +98,7 @@ elif [ "$options" = "Incremental_Backup" ]; then
         mkdir -p $location;
 
         echo "Starting incremental backup";
-        rsync -abvzhe ssh --progress --delete --max-size='10000k' --exclude-from 'exclude_list.txt' / user@83.212.127.62:$location;
+#        rsync -abvzhe --progress --delete --max-size='10000k' --exclude-from 'exclude_list.txt' / $location;
         echo -e "\nIncremental backup complete!";
 
 elif [ "$options" = "Schedule_Backup" ]; then
@@ -135,7 +135,7 @@ elif [ "$options" = "Schedule_Backup" ]; then
 elif [ "$options" = "View_Scheduled_Backups" ]; then
 	crontab -l | grep rsync;
 elif [ "$options" = "Restore_Most_Recent_Backup" ]; then
-	rsync -avr ssh --progress --delete * user@83.212.127.62:/;
+	rsync -avr --progress --delete * /;
 	echo "Most recent backup restored"
 elif [ "$options" = "Quit" ]; then
 	exit;
