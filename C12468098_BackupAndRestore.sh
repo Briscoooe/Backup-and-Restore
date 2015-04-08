@@ -47,7 +47,7 @@ ask()
 # This function adds the cron job to the cron table
 add_cron()
 {
-	crontab -l | { cat; echo "$1 rsync -avbzhe ssh --delete --progress --max-size='10000k' --exclude-from 'exclude_list.txt' / $location;"; } | crontab -;
+	crontab -l | { cat; echo "$1 rsync -avbzhe ssh --delete --progress --max-size='10000k' --exclude-from 'exclude_list.txt' / user@83.212.127.62:$location;"; } | crontab -;
 }
 
 choices="Full_Backup Schedule_Backup View_Scheduled_Backups Restore Quit"
@@ -63,7 +63,7 @@ if [ "$options" = "Full_Backup" ]; then
 	mkdir -p $location;
 
 	echo "Starting intial backup";
-	#rsync -avzhe ssh --progress --delete --max-size='10000k' --exclude-from 'exclude_list.txt' / $location;
+	rsync -avzhe ssh --progress --delete --max-size='10000k' --exclude-from 'exclude_list.txt' / user@83.212.127.62:$location;
 	echo -e "\nInitial backup complete!";
 
 elif [ "$options" = "Schedule_Backup" ]; then
@@ -103,6 +103,7 @@ elif [ "$options" = "View_Scheduled_Backups" ]; then
 	crontab -l;
 elif [ "$options" = "Restore" ]; then
 	rsync -avr * $location;
+	echo "Most recent backup restored"
 elif [ "$options" = "Quit" ]; then
 	exit;
 else
@@ -110,7 +111,6 @@ else
 fi
 done
 
-#user@83.212.127.62:/home/user/backup
 
 # Removing the user defined path from the exclude list
 head -n -1 exclude_list.txt > temp.txt
