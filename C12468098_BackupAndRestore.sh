@@ -50,7 +50,7 @@ add_cron()
 	crontab -l | { cat; echo "$1 rsync -avbzhe ssh --delete --progress --max-size='10000k' --exclude-from 'exclude_list.txt' / user@83.212.127.62:$location;"; } | crontab -;
 }
 
-choices="Full_Backup Schedule_Backup View_Scheduled_Backups Restore Quit"
+choices="Full_Backup Incremental_Backup Schedule_Backup View_Scheduled_Backups Restore_Most_Recent_Backup Quit"
 
 select options in $choices; do
 if [ "$options" = "Full_Backup" ]; then
@@ -65,6 +65,19 @@ if [ "$options" = "Full_Backup" ]; then
 	echo "Starting intial backup";
 	rsync -avzhe ssh --progress --delete --max-size='10000k' --exclude-from 'exclude_list.txt' / user@83.212.127.62:$location;
 	echo -e "\nInitial backup complete!";
+
+elif [ "$options" = "Incremental_Backup" ]; then
+	read -p "Enter the ABSOLUTE path for the backup to be stored " location;
+
+	# Adding the path to the exclude list to avoid an infinite loop
+        echo $location >> exclude_list.txt;
+
+        # Making the backup directory in case it doesn't exist already
+        mkdir -p $location;
+
+        echo "Starting incremental backup";
+        rsync -abvzhe ssh --progress --delete --max-size='10000k' --exclude-from 'exclude_list.txt' / user@83.212.127.62:$location;
+        echo -e "\nIncremental backup complete!";
 
 elif [ "$options" = "Schedule_Backup" ]; then
 	if ask "Would you like to schedule backups to the location previously specified?"; then
@@ -101,8 +114,8 @@ elif [ "$options" = "Schedule_Backup" ]; then
 	done
 elif [ "$options" = "View_Scheduled_Backups" ]; then
 	crontab -l;
-elif [ "$options" = "Restore" ]; then
-	rsync -avr * $location;
+elif [ "$options" = "Restore_Most_Recent_Backup" ]; then
+	rsync -avr ssh --progress --delete * user@83.212.127.62:/;
 	echo "Most recent backup restored"
 elif [ "$options" = "Quit" ]; then
 	exit;
@@ -110,8 +123,3 @@ else
 	echo "Please select a valid option";
 fi
 done
-
-
-# Removing the user defined path from the exclude list
-head -n -1 exclude_list.txt > temp.txt
-mv temp.txt exclude_list.txt
