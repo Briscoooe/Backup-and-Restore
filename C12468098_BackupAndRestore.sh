@@ -8,7 +8,7 @@
 #!/bin/bash
 
 # This function is used to validate yes or no answers inputted by the user
-# It was taken from this public GitHub repository https://gist.github.com/davejamesmiller/1965569
+# References: https://gist.github.com/davejamesmiller/1965569
 ask()
 {
 	while true; do
@@ -64,10 +64,11 @@ get_path() {
 
 clear
 
-# This function adds the cron job to the cron table
+# This function adds the cron job to the cron table. The frequency of the cron job running is
+# based on the value of the parameter passed into the function
 add_cron()
 {
-	crontab -l | { cat; echo "$1 rsync -avbzhe --delete --progress --max-size='10000k' --exclude-from 'exclude_list.txt' / $location;"; } | crontab -;
+	crontab -l | { cat; echo "$1 rsync -avbzhe ssh --delete --progress --max-size='10000k' --exclude-from 'exclude_list.txt' / user@snf-33535.vm.okeanos-global.grnet.gr:$location;"; } | crontab -;
 }
 
 choices="Full_Backup Incremental_Backup Schedule_Backup View_Scheduled_Backups Restore_Most_Recent_Backup Quit"
@@ -75,6 +76,10 @@ choices="Full_Backup Incremental_Backup Schedule_Backup View_Scheduled_Backups R
 select options in $choices; do
 if [ "$options" = "Full_Backup" ]; then
 
+	# This line calls the get_path function to check if the path has already been set by the user.
+	# If it hasn't then the user will be prompted to enter it. If it has then the user will be 
+	# asked if they wish to use the same location again, if they select no, then they will be prompted
+	# to enter it again
 	location=`get_path $location`;
 
 	# Adding the path to the exclude list to avoid an infinite loop
@@ -84,7 +89,7 @@ if [ "$options" = "Full_Backup" ]; then
 	mkdir -p $location;
 
 	echo "Starting intial backup";
-#	rsync -avzhe --progress --delete --max-size='10000k' --exclude-from 'exclude_list.txt' / $location;
+	rsync -avzhe ssh --progress --delete --max-size='10000k' --exclude-from 'exclude_list.txt' / user@snf-33535.vm.okeanos-global.grnet.gr:$location;
 	echo -e "\nInitial backup complete!";
 
 elif [ "$options" = "Incremental_Backup" ]; then
@@ -92,19 +97,20 @@ elif [ "$options" = "Incremental_Backup" ]; then
 	location=`get_path $location`;
 
 	# Adding the path to the exclude list to avoid an infinite loop
-    	echo $location >> exclude_list.txt;
+	echo $location >> exclude_list.txt;
 
-        # Making the backup directory in case it doesn't exist already
-        mkdir -p $location;
+	# Making the backup directory in case it doesn't exist already
+	mkdir -p $location;
 
-        echo "Starting incremental backup";
-#        rsync -abvzhe --progress --delete --max-size='10000k' --exclude-from 'exclude_list.txt' / $location;
-        echo -e "\nIncremental backup complete!";
+	echo "Starting incremental backup";
+	rsync -abvzhe ssh --progress --delete --max-size='10000k' --exclude-from 'exclude_list.txt' / user@snf-33535.vm.okeanos-global.grnet.gr:$location;
+	echo -e "\nIncremental backup complete!";
 
 elif [ "$options" = "Schedule_Backup" ]; then
 
 	location=`get_path $location`;
 
+	# Adding the path to the exclude list to avoid an infinite loop
 	echo $location >> exclude_list.txt;
 
 	# Making the backup directory in case it doesn't exist already
@@ -133,9 +139,14 @@ elif [ "$options" = "Schedule_Backup" ]; then
 	fi
 	done
 elif [ "$options" = "View_Scheduled_Backups" ]; then
+
 	crontab -l | grep rsync;
 elif [ "$options" = "Restore_Most_Recent_Backup" ]; then
-	rsync -avr --progress --delete * /;
+
+	location=`get_path $location`
+	
+	rsync -abvzhe --progress --delete --max-size='10000k' --exclude-from 'exclude_list.txt' user@snf-33535.vm.okeanos-global.grnet.gr:$location /;
+
 	echo "Most recent backup restored"
 elif [ "$options" = "Quit" ]; then
 	exit;
