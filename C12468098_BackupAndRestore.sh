@@ -42,7 +42,7 @@ ask()
 }
 
 # This function checks if the location variable has already been set by the user and if it has
-# then the yes/no function is used to ask the user whether or not they would like to use the 
+# then the yes/no function is used to ask the user whether or not they would like to use the
 # same path again or enter a new one for whatever purpose they need it for
 get_path() {
 
@@ -75,7 +75,7 @@ choices="Full_Backup Incremental_Backup Schedule_Backup View_Scheduled_Backups R
 select options in $choices; do
 if [ "$options" = "Full_Backup" ]; then
 
-	location=`get_path $path`;
+	location=`get_path $location`;
 
 	# Adding the path to the exclude list to avoid an infinite loop
 	echo $location >> exclude_list.txt;
@@ -89,7 +89,7 @@ if [ "$options" = "Full_Backup" ]; then
 
 elif [ "$options" = "Incremental_Backup" ]; then
 
-	location=`get_path $path`;
+	location=`get_path $location`;
 
 	# Adding the path to the exclude list to avoid an infinite loop
     	echo $location >> exclude_list.txt;
@@ -103,7 +103,7 @@ elif [ "$options" = "Incremental_Backup" ]; then
 
 elif [ "$options" = "Schedule_Backup" ]; then
 
-	location=`get_path $path`;
+	location=`get_path $location`;
 
 	echo $location >> exclude_list.txt;
 
