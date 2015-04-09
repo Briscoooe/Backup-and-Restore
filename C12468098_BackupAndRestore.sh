@@ -83,6 +83,8 @@ if [ "$options" = "Full_Backup" ]; then
 	location=`get_path $location`;
 
 	# Adding the path to the exclude list to avoid an infinite loop
+	# This is necessary as the I am backing the files up to the cloud virtual machine that I am running the
+	# scripts from
 	echo $location >> exclude_list.txt;
 
 	# Making the backup directory in case it doesn't exist already
@@ -100,6 +102,8 @@ elif [ "$options" = "Incremental_Backup" ]; then
 	echo $location >> exclude_list.txt;
 
 	# Making the backup directory in case it doesn't exist already
+	# This is necessary as the I am backing the files up to the cloud virtual machine that I am running the
+	# scripts from
 	mkdir -p $location;
 
 	echo "Starting incremental backup";
@@ -111,6 +115,8 @@ elif [ "$options" = "Schedule_Backup" ]; then
 	location=`get_path $location`;
 
 	# Adding the path to the exclude list to avoid an infinite loop
+	# This is necessary as the I am backing the files up to the cloud virtual machine that I am running the
+	# scripts from
 	echo $location >> exclude_list.txt;
 
 	# Making the backup directory in case it doesn't exist already
@@ -139,7 +145,7 @@ elif [ "$options" = "Schedule_Backup" ]; then
 	fi
 	done
 elif [ "$options" = "View_Scheduled_Backups" ]; then
-
+	# This line shows all the cronjobs which involve rsync
 	crontab -l | grep rsync;
 elif [ "$options" = "Restore_Most_Recent_Backup" ]; then
 
