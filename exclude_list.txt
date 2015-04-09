@@ -5,10 +5,4 @@
 /run/*
 /mnt/*
 /lost+found
-/home/user/backup2
-/home/user/test
-/home/user/test1
-/home/user/sshbackup
-/home/user/firstbackup
-/home/user/firstbackup
-/home/user/firstbackup
+/var/tmp/*
